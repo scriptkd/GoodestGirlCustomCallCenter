@@ -4,12 +4,12 @@ const VoiceResponse = require("twilio/lib/twiml/VoiceResponse");
 
 class Twilio {
   phoneNumber = "+1 480-566-9373";
-  phoneNumberSid = "PN244f6c41946b202436c11be8e3c94f00";
-  tokenSid = "SK11bcbb42189e83a479fe5b0bc5940f8c";
-  tokenSecret = "Ttuc9OBvfEu7ohKbknVlDvI03wDmNQoT";
-  accountSid = "AC48dd19d5e084157dac77687227028eb8";
-  verify = "VAbc97017eeb8149c68bcf29b41e427351";
-  sashaLineSid = "AP515b2374eb85eb209de0e69bf875e34a";
+  phoneNumberSid = "Phone SID here!";
+  tokenSid = "token SID here!";
+  tokenSecret = "Whatever your Token is Here!";
+  accountSid = "Whatever your SID is Here";
+  verify = "Verify Code Here!";
+  sashaLineSid = "Whatever your Line SID is Here!";
   client;
   constructor() {
     this.client = twilio(this.tokenSid, this.tokenSecret, {
