@@ -1,0 +1,70 @@
+# Here, we're going to setup our calls to be answered using the twilio client.
+# let's navigate back to our callprogress file
+
+//Were going to create a simple function called 'answerCall', It's going to look like this
+
+onClick = {() => answerCall(call.data.CallSid)}
+
+//We haven't defined the function yet in our server.js file, but were going to do this next
+
+//lets look at our socket.on('connection') function
+
+socket.on("connection", (socket) => {
+  console.log("Socket Connected at", socket.id);
+  socket.emit("twilio-token", { token: getTokenForVoice("Sasha!") });
+  socket.on("disconnect", () => {
+    console.log("Socket Disconnected at", socket.id);
+  });
+
+  //we add the answer call event that we emitted from callprogress function in callprogress.js
+
+  //server.js
+  socket.on('answer-call', (sid) => {
+    console.log('Answering Call. ID:', sid);
+  })
+});
+
+//callprogress.js at the top of the function
+
+  function answerCall(sid){
+    socket.client.emit('answer-call', {sid});
+  }
+
+  so now we're going to connect the call to our application. again, were going to utilize the url we got from
+  localtunnel
+
+   in our server.js we write the following code:
+
+//Notice we use twilio for the answerCall function. this function doesnt exist yet, so let's go over
+to twilio.js and create it.
+
+   socket.on('answer-call', ({sid}) => {
+    console.log('Answering Call. ID:', sid);
+    twilio.answerCall(sid);
+  })
+
+  //Twilio.js
+
+  //we can go ahead and just add the function as apart of our Twilio class 
+
+    answerCall(sid) {
+    console.log('Answering Call. SID #', sid);
+    this.client.calls(sid).update({
+      url: "https://sashaline.loca.lt/connect-call",
+      method: "POST",
+      function(err, call) {
+        console.log("answerCall", call);
+        if (err) {
+          console.log("answerCall", err);
+        }
+      },
+    });
+  }
+
+  //Notice that we created a new endpoint called '/connect-call'. we're going to reference this in our server in a second
+
+  This all ties back into our callprogressjs file, where we emit the event to our server. Please reference that file
+  to make sense of the code above.
+
+  next we're going to connect our calls to the browser!
+

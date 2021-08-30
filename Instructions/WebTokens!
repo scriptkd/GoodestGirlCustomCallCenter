@@ -1,0 +1,89 @@
+#Now we want to send web tokens to also verify our client
+
+import json web Token like so in your terminal:
+
+yarn add jsonwebtoken
+
+# create a new util folder in the backend folder Now
+# add a file called jwt.js
+# the code should look like this!
+
+const jwt = require('jsonwebtoken'); //we require it
+
+const SECRET_KEY = 'SOME_SECRET_STRING'; //supposed to be secret, so we creat and environment variable
+
+#then we create two functions to create a key, and then verify that key.
+
+//this function takes a username and assigns is a secret key unique to the username
+function createJwt(username){
+    const token = jwt.sign({username}, SECRET_KEY);
+    return token
+}
+
+//this function takes the same token and verifies it by the secret key variable
+function verifyToken(token){
+    const data = jwt.verify(token, SECRET_KEY);
+    return data
+}
+
+//We then export it like so
+module.exports = { createJwt, verifyToken };
+
+# next we want to connect to our backend server.js file. Like so:
+
+const jwt = require('./utils/jwt');
+
+then we add the code to create he token in our app.post('/verify') line. Like this:
+
+app.post('/verify', async (req, res) => {
+    const { to, code, username } = req.body;
+    const data = await twilio.verifyCode(to, code);
+    if (data.status === 'approved') {
+        const token = jwt.createJwt(username);
+        return res.send({ token });
+    }
+    res.status(401).send('Invalid Token');
+});
+
+# Now we want to go to our 1app.js and add the username prarameter when requesting the '/verify' endpoint. Like so:
+
+  async function sendCode() {
+    console.log('Sending Code to Server...');
+    await axios.post('/verify', {
+      to: `+1 ${user.mobileNumber}`,
+      code: user.verificationCode,
+      username: user.username
+    })
+  }
+
+  # Our send code function should look like this now:
+
+  //in our original app.js we de structure the array [token, setToken function] in our useState() function
+
+   const [token, setToken] = useState();
+
+    async function sendCode() {
+    console.log('Sending Code to Server...');
+    let response = await axios.post('/verify', {
+      to: `+1 ${user.mobileNumber}`,
+      code: user.verificationCode,
+      username: user.username
+    })
+    console.log('Recieved token ', response.data.token);
+    setToken(response.data.token);
+  }
+
+  //make sure that when you're trying to access the data, to ensure that your twilio (Twilio.js) functions return a value from the promise, Like this:
+      async verifyCode(to, code) {
+        const data = await this.client.verify
+        .services(this.verify)
+        .verificationChecks.create({
+            to,
+            code,
+        })
+        console.log('verifyCode', data);
+
+        //this is where you need to return the data. By default, it's probably best to return 
+        some type of value
+        return data;
+    }

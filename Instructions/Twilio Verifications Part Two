@@ -1,0 +1,70 @@
+#So now, we want to retrieve the verification code form our server so 
+we can authenticate our user. In the login.js file
+we add the following code
+
+{verificationSent &&
+                        <Form.Input
+                            fluid
+                            icon='key'
+                            iconPosition='left'
+                            placeHolder='Verify Code Here'
+                            value={verificationCode}
+                            onChange={(event, data) => {
+                                populateFields(event, data)
+                            }}
+                            name='verificationCode'>
+                        </Form.Input>}
+
+//All this code does is check whether or not our sendsmscode function resolved its promise,
+we initialize it false, and when it becomes true, it renders a new input field. Of course,
+we also want to add the vairiable to our login function, and then again in our immer function in app.js. Like so:
+
+function App() {
+  const [user, setUser] = useImmer({
+    username: '',
+    mobileNumber: '',
+    verificationCode: '',
+    verificationSent: false
+  })
+
+  //notice that verificationSent is set to false. We set to true in the sendsmscode function. Like so:
+
+    async function sendSmsCode() {
+    console.log(`Sending SMS...`);
+    const response = await axios.post('/login', {
+      to: `+1 ${user.mobileNumber}`,
+      username: user.username,
+      channel: 'sms',
+    });
+    setUser((draft) => {
+      draft.verificationSent = true;
+    })
+    console.log(response.data)
+  }
+
+  //Then we write our send code function.
+
+    async function sendCode() {
+    console.log('Sending Code to Server...');
+    const response = await axios.post('/verify', {
+      to: `+1 ${user.mobileNumber}`,
+      code: user.verificationCode
+    })
+    console.log('Verification Response: ', response.data);
+  }
+
+  //then we return it. Like so:
+
+    return (
+    <div>
+      <Login
+        user={user}
+        setUser={setUser}
+        sendSmsCode={sendSmsCode}
+        sendCode={sendCode} />
+    </div>
+  );
+
+  NOTE: YOU HAVE TO GO BACK TO YOUR SERVER.JS FILE 
+  AND CHANGE YOUR APP.GET TO APP.POST OR ELSE THE SEND CODE FUNCTION WONT WORK
+

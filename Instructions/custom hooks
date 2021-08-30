@@ -1,0 +1,84 @@
+# we're going to use custom hooks to help us manage local storage
+# in our src folder, we're going to create a new directory called 'hooks'
+# then we create a new file called useLocalStorage.js
+# this can be named anything, we're just practicing hooks at this point
+
+the code looks like this:
+
+import { useState } from 'react';
+
+
+//Define a function that taks in a key value and an inital value(which will most likely be null)
+function useLocalStorage(key, initalValue) {
+
+    //we use useState to track the state without deifining a class. Like so:
+    // try catch block to catch errors
+
+    const [storedValue, setStoredValue] = useState(() => {
+
+        // we get a key from local storage
+        // and return it if there is a valid item
+        // if not, we return the initalValue
+
+        try {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : initalValue;
+        }
+        catch (error) {
+            console.log(error);
+            return initalValue;
+        }
+    });
+
+    //  Of course, at the end, we need to initialize our setValue function
+
+    const setValue = (value) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            setStoredValue(value)
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+    return [storedValue, setValue]
+}
+
+export default useLocalStorage;
+
+our app.js sendcode function now looks like this:
+
+//here, we are initializing the useState function useLocalStorage like so.
+//stored value = 'token' and initalValue = null
+//please view the uslocalstprge.js file in the hooks folder for reference.
+
+const [storedToken, setStoredToken] = useLocalStorage('token', null);
+
+  async function sendCode() {
+    console.log('Sending Code to Server...');
+    let response = await axios.post('/verify', {
+      to: `+1 ${user.mobileNumber}`,
+      code: user.verificationCode,
+      username: user.username
+    })
+    console.log('Code Retrieved!')
+    console.log('Recieved token ', response.data.token);
+    setStoredToken(response.data.token);
+  }
+
+  finally, we add a condition in the return statement that checks if we have a stored token, if so, we display another component. like so:
+
+    return (
+    <div>
+      {storedToken ? (<h1>welcome!</h1>) : (<Login
+        user={user}
+        setUser={setUser}
+        sendSmsCode={sendSmsCode}
+        sendCode={sendCode} />
+    )}
+    </div>
+  );
+}
+
+export default App;

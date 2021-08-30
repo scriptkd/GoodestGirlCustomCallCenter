@@ -1,0 +1,111 @@
+#In the src folder, you'll now want to create a components folder.
+
+#inside that components folder, create a file called login.js and write 
+it like you would a normal react component. Like so:
+
+import React from 'react';
+
+function Login(){
+    return <div> //code here </div>
+}
+
+export default Login
+
+IMPORTANT NOTE: ALWAYS USE CAPITALIZATION WHEN NAMING FUNCTIONS AND EXPORTING.
+REACT DOESNT LIKE IT WHEN YOU DONT USE CAPITALIZATION.
+
+#You can then import the Login component into you app.js file
+
+Please view login.js to see the syntax for creating the form. 
+will have to view the docuementation for semantic CSS to see what else
+you can do.
+
+#Next, in the frontend folder, you want to use something called 'immer'
+add it like so:
+
+yarn add immer use-immer;
+
+immer will help you manipulate the state of your elements
+
+There is no default import for useImmer so we have to import like this
+
+import { useImmer } from 'use-immer';
+
+#the code in App.js
+
+function App() {
+
+//useImmer takes an array with one object and on callback function
+// in this case it's the object 'User' and the function 'setUser'
+//both of these are defined in the login.js file
+
+  const [user, setUser] = useImmer({
+    username: '',
+    mobileNumber: '',
+  })
+  return (
+    <div>
+      <Login user={user} setUser={setUser} />
+    </div>
+  );
+}
+
+export default App;
+
+//Login.js looks like this now.
+//the login function now takes an object and a callback function, just like our app function above
+//the take the username and mobileNumber attributes just like the useImmer function
+//username and mobile have been deconstructed into the user object so the variables can be declared easier
+
+function Login({ user: {username, mobileNumber} , setUser}) {
+    function populateFields(event, data){
+        setUser((draft) => {
+            draft[data.name] =  data.value;
+        })
+    }
+
+//these are the DOM elements we return
+//styled inline for the sake of speed
+//we use the populateFields function to bind the input to the form
+which is defined in the login function above
+//we explicitly call data.vale to data.name because we're using semantic UI 
+//usually we use draft[event.name] = event.target.value;
+//Please check the semantic ui docuementation for further customization
+
+        return (
+        <Grid textAlign='center' verticalAlign='middle' style={{ height: '100vh' }}>
+            <Grid.Column style={{ maxWidth: 450 }}>
+                <Header as='h2' color='green' textAlign='center'>
+                    Log into your Account here
+                </Header>
+                <Form>
+                    <Segment raised>
+                        <Form.Input
+                            fluid
+                            icon='user'
+                            iconPosition='left'
+                            placeHolder='Username'
+                            value = {username}
+                            onChange = {(event, data) => {
+                                populateFields(event, data)
+                            }}
+                            name = 'username'>
+                        </Form.Input>
+                        <Form.Input fluid
+                            icon='mobile alternate'
+                            iconPosition='left'
+                            placeHolder='Mobile Number'
+                            value = {mobileNumber}
+                            onChange = {(event, data) => {
+                                populateFields(event, data);
+                            }}
+                            name = 'mobileNumber'>
+                        </Form.Input>
+                        <Button color='green'
+                            fluid>Sign In</Button>
+                    </Segment>
+                </Form>
+            </Grid.Column>
+        </Grid>
+    )
+

@@ -1,0 +1,140 @@
+#In the command line or terminal, we want to create a couple folders, one for frontend and another on backend
+-> (Path)> mkdir frontend
+-> (Path)> mkdir backend
+
+#In the backend, you want to create a package lock file in the backend like so
+(Path/backend)>npm init -y
+
+#Create a new folder in your backend and call it what you want. You'll have to put the following variables in
+const phoneNumber = (Phone Number Here);
+const phoneNumberSid = (Phone Number Sid Here); 
+
+#Here, you'll have to create a new api key and set it to standard
+const tokenSid = (Token SID);
+const tokenSecret = (Token Secret);
+
+#Collect the account SID
+const accountSid = (Account SID);
+
+#For verification, go the verify section in the console, create new service and give it a name
+#collect the Sid
+const verify = (Verify App Sid);
+
+
+#next you'll have to import twilio, express, body-parser, and socket.io
+(Path/backend)> npm add twilio express body-parser socket.io
+
+#create a new file in backend to be the server
+#Put in the following code to test the server
+
+const express = require('express');
+
+const app = express();
+
+const PORT = 3000;
+
+app.get('/test', (req, res) => {
+    res.send("Hey it's twilio :)")
+});
+
+app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`)
+})
+
+#You can test the code above by entering "npm start", after that, you can visit the url localhost:(Whatever you put for port #)/test
+#Also you can add 'npm add nodemon' to get realtime changes
+
+#add a script to ethe package.JSON file like this:
+  "scripts": {
+    "start:dev": "nodemon server.js"
+  }
+#run the script
+yarn start:dev
+
+#creating two more endpoints with a login and verifying the login
+app.get('/login' , (req, res) => {
+    console.log('Youre logging in');
+//We're going to pass out phone number here.
+})
+
+app.get('/verify', (req, res) => {
+    console.log('Were verifying..');
+})
+
+#We're going to create scripts variables underneath the scripts.
+#In this case its "nodemonConfig":{"env": {"MOBILE": "(phone number here)"}}
+#We can pretty much put any variable in like this and call it gloabally using process.env.Variable_name
+#In this case, we have process.env.MOBILE = (Whatever number you put in here);
+
+#Now we can setup the Twilio Class
+
+const twilio = require('twilio');
+
+class Twilio {
+    phoneNumber = "(varible)";
+    phoneNumberSid = "(varible)";
+    tokenSid = "(varible)";
+    tokenSecret = "(varible)";
+    accountSid = "(varible)";
+    verify = "(varible)";
+    client; //We add attributes in the next line
+    constructor() {
+        this.client = twilio(this.tokenSid, this.tokenSecret, { accountSid: this.accountSid, })
+    }
+//A function that gets the client info specified in the constructor
+    getTwilio(){
+        this.client;
+    }
+
+//This is the function that sends the data over to the client
+    async sendVerify(to, channel){
+      const data = await this.client.verify.services(this.verify).verifications.create({
+            to, 
+            channel,
+        });
+
+        console.log('sendVerify: ', data);
+        return data;
+    }
+}
+
+//Create a new instance of the class
+//freeze it so it can't be changed
+
+const instance = new Twilio();
+Object.freeze(instance);
+
+module.exports = instance;
+
+#Let's go back to the server.js file and add the code in the '/login' path. Like so:
+app.get('/login' , async (req, res) => {
+    console.log('Youre logging in');
+    const data = await twilio.sendVerify(process.env.MOBILE, 'sms');
+    res.send(data);
+})
+
+
+#Next, we want to verfiy the code that was sent to the recipent.
+# you'll want to add theis code below the sendVerify function, as they're somewhat similar
+
+async verifyCode(to, code) {
+        const data = await this.client.verify
+        .services(this.verify)
+        .verificationChecks.create({
+            to,
+            code,
+        })
+        console.log('verifyCode', data);
+        return;
+    }
+
+#And just like last time, we want to run this function in our server
+
+app.get('/verify', async (req, res) => {
+    console.log('Were verifying..');
+    const data = await twilio.verifyCode(process.env.MOBILE, req.query.code);
+    return data;
+})
+
+
+#That's about it for Verifications through SMS!!

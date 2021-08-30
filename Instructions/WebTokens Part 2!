@@ -1,0 +1,73 @@
+so ther's an issue with the web tokens. it wors right now, but the app checks to see if ANY stored token exists,
+if so, it still performs the functions of the application. So we're going to need to do something to validate web tokens.
+
+# we'll start by creating a new endpoint in our server.js file
+
+app.post("/validate-token", (req, res) => {
+  console.log("Validating Token...");
+  const { token } = req.body;
+  let isValid = false;
+  try {
+    isValid = jwt.verifyToken(token);
+  } catch (error) {
+    console.log(error);
+  }
+  res.send(isValid);
+});
+
+nice and straightforward. we initialize isValid to false, then we check if jwt brings back true, then we return the result. now we're going to hook up the frontend
+// App.js
+
+Normally we would use the useLocalStorage and values it returns, but we want to keep that code the same.
+So what we're going to do now is create another custom hook to validate web tokens
+
+In this case were going to declare a function called useTokenFromLocalStorage. all we're going to do here
+is import the locally stored value 'token' and validate it. Take a look at the jwt utils file for reference.
+
+import { useEffect, useState } from "react"; //updates the value of token each time it changes
+import axios from "../utils/axios"; //sets our server
+import useLocalStorage from "./useLocalStorage";
+
+function useTokenFromLocalStorage(initalValue) {
+  const [value, setValue] = useLocalStorage("token", initalValue); //destructure the value key as 'token' and initalValue at null
+  const [isValid, setIsValid] = useState(false); //initialize isValid to false 
+
+  useEffect(() => {
+    validateToken();
+  }, [value]);
+
+  async function validateToken() {
+    const { data } = await axios.post("/validate-token", { token: value });
+    console.log("Validate Token ? : ", data);
+    setIsValid(data.isValid);
+  }
+  return [value, setValue, isValid];
+}
+
+export default useTokenFromLocalStorage;
+
+Finally, we display whatever fragment in the app,js file based on the conditional statement like so:
+
+App.js
+
+  return (
+    <div>
+      {isValidToken ? (
+        <CallCenter calls={calls} />
+      ) : (
+        <>
+          <Login
+            user={user}
+            setUser={setUser}
+            sendSmsCode={sendSmsCode}
+            sendCode={sendCode}
+          />
+        </>
+
+        //We need to display login as a fragment on conditional rendering
+      )}
+    </div>
+  );
+}
+
+export default App;

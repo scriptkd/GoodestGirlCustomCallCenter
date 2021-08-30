@@ -1,0 +1,46 @@
+ So now, we want to setup a couple more end points in our server/ Like so:
+
+ app.post('/call-new', (req, res) => {
+    console.log('New call incoming');
+    res.send('ok');
+})
+app.post('/call-status-changed', (req, res) => {
+    console.log('Call status changed.');
+    res.send('ok')
+})
+
+You can see that the endpoints in the post request match those of the endpoints 
+specified in the console.
+
+Twilio doesn't understend the res.send('ok') command, it actually needs to be sent something in the form of 
+twiML, which we will do next.
+
+go to your twilio file and add a new function that will create a message:
+
+in twilio.js, the template function will look like this:
+
+    voiceResponse(message) {
+        const twiml = new VoiceResponse();
+        twiml.say({
+            voice: "Polly.Amy", //we can pick whatever voice
+            loop: 2 //loop twice just to see if it works
+        },
+            message //then we have whatever message we want to put
+        )
+        return twiml; //then we return the value of the response
+    }
+
+    After putting this in twilio.js, we want to go back to our server.js file in put
+    in our voiceResponse function and provide a message. It will look like this:
+
+    app.post('/call-new', (req, res) => {
+    console.log('New call incoming');
+    const greeting = twilio.voiceResponse('Thank you for calling Sasha\'s Hotline! The hotline for the very best girl. How can we help?');
+    res.type('text/xml');
+    res.send(greeting.toString());
+})
+
+Make sure to have your local tunnel setup so we can reach the server
+
+
+

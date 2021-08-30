@@ -1,0 +1,13 @@
+io.use((Socket, next) => {
+  console.log("Socket Middleware");
+  if (Socket.handshake.query && Socket.handshake.query.token) {
+    const { token } = Socket.handshake.query;
+    try {
+      const result = jwt.verifyToken(token);
+      console.log("Token Accepted!");
+      if (result.username) return next;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});

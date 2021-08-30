@@ -1,0 +1,36 @@
+in this section, we're going to go through how to change the display, based on the status of the call
+First, we want to go to CallProgress.js and add a conditional statement to display if a certain condition is true.
+for example, we want the first step "ringing' to show as completed if the the CallStatus variable is anything other than 'ringing'
+
+our CallProgress function looks like this:
+
+function CallProgress({ call }) {
+  return (
+    <Container>
+      <Step.Group fluid>
+        <Step
+          icon="phone"
+          title="Ringing"
+          description= {call.data.Direction + ' call from ' + call.data.From + ' | ' + call.data.FromState + ', ' + call.data.FromCountry}
+          active = {call.data.CallStatus === 'ringing'}
+          completed = {call.data.CallStatus !== 'ringing'} //Notice the expression after the attribute to determine what the step should look like
+          //We do this all the way down the line 
+        />
+        <Step
+          icon="cogs"
+          title="In Queue"
+          description="User Currently Queue"
+          active = {call.data.CallStatus === 'enqueue'}
+          disabled = {call.data.CallStatus === 'ringing'}
+        />
+        <Step
+          icon="headphones"
+          title="On Call"
+          description="Speaking with John"
+          disabled = {call.data.CallStatus === 'ringing' || call.data.CallStatus === 'enqueue'}
+        />
+        <Step icon="times" title="End Call" description="Call Ended" disabled = {call.data.CallStatus !== 'completed'} completed = {call.data.CallStatus === 'completed'} />
+      </Step.Group>
+    </Container>
+
+    #that's pretty much all thereis to it.

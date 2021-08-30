@@ -1,0 +1,88 @@
+Now that the login is done,
+we can add the component thats going to display when the stored token variable
+becomes true.
+
+In our components section, we want to add the components to display.
+In this case, it's the call center component and the navbar component
+
+The call center component looks like this:
+
+import React from "react";
+import NavBar from "./navBar";
+
+function CallCenter(){
+    return <div>
+        <NavBar></NavBar>
+    </div>
+}
+
+export default CallCenter;
+
+and the navbar looks like this:
+
+import React from "react";
+
+function NavBar(){
+    return <div>
+        Hey it's the NavBar!
+    </div>
+}
+
+export default NavBar;
+
+#A couple of rules for components
+# Call center is the parent component made up of a couple tinier components
+always capitalize your classes or functions that you're planning to export!
+#After that is pretty straightfoward. I can style with Semantic UI along with some vanilla CSS and JS in the
+custome styling and cutom JS folders, as they are included in the index.js file
+
+#From here, we can start styling our navBar. It looks something like this:
+
+import React from "react";
+import { Container, Menu, Image } from 'semantic-ui-react';
+
+function NavBar() {
+    return <Menu>
+        <Container text>
+            <Menu.Item><i className='phone icon'></i></Menu.Item>
+            <Menu.Item header>Sasha Hotline</Menu.Item>
+            <Menu.Item position = 'right'><Image src='https://semantic-ui.com/images/avatar/large/christian.jpg' avatar></Image></Menu.Item>
+            <Menu.Item>John Doe</Menu.Item>
+        </Container>
+    </Menu>
+}
+
+export default NavBar;
+
+#After that, we create another component called call progress. where we track the status of the call.
+Code looks like this
+
+import React from 'react';
+import { Container, Step } from 'semantic-ui-react';
+
+function CallProgress() {
+    return <Container>
+        <Step.Group fluid>
+            <Step icon='phone' title='Ringing' description="+1 555-5555" completed />
+            <Step icon='cogs' title='In Queue' description="User Currently Queue" active />
+            <Step icon='headphones' title='On Call' description='Speaking with John' disabled />
+            <Step icon='times' title='End Call' description='Call Missed' />
+        </Step.Group>
+    </Container>
+}
+
+export default CallProgress;
+
+//Hard coded a couple things, but we're going to change that soon with local tunnel, a service that allows you to deploy a path
+from you local server to the internet
+
+npm install localtunnel -g 
+lt --port(whatever port you want to connect to) --subdomain(whatever you want the domain to say)
+
+#local tunnel should then give us our URL
+
+# at this point, we need to go back to our twilio console and reassign the incoming calls 
+to our incoming call webhook and the status change webhook. In this case, the incoming call web hook is https://sashaline.loca.lt/call-new
+and the status change webhook is https://sashaline.loca.lt/call-status-change
+
+# next we'll configure twilio to handle the webhook URLs we just mentioned

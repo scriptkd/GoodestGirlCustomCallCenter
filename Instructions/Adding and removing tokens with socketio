@@ -1,0 +1,42 @@
+In our app.js file, we want to create another useEffect Function to check values as they change
+in this case its the boolean value of isValidToken and the storedToken, it looks like this;
+
+ useEffect(() => {
+    if (isValidToken) {
+      console.log("Valid Token");
+      return instance.addToken(storedToken);
+    }
+    console.log('Invalid Token')
+    instance.removeToken();
+  }, [isValidToken, storedToken]);
+
+  right now, we still have to refresh the page on the frontend to see any changes,
+  but its going to be a little different on the backend. Please refernce our socketio file
+  to see how we constructed these function.
+
+  on the backend, we're going to use a middleware, so we're going to utilize socket.use in this case. like this:
+
+  socket.use((socket, next) => {
+    console.log("Socket Middleware");
+
+    //Check if our query i Socket.io js file has a token.
+    //if so, assign the deconstructed value 'token' to the query
+
+    if (socket.handshake.query && socket.handshake.query.token) {
+      const { token } = socket.handshake.query;
+      try {
+
+    //we call our verifyToken function from before
+
+        const result = jwt.verifyToken(token);
+        console.log("Token Accepted!");
+
+    //If we have a username, return next. Please keep in mind that next is function. return next is not Valid
+    //you have to put next();
+    
+        if (result.username) return next();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  });

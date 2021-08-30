@@ -1,0 +1,85 @@
+# here, we are going to set up twilio client to recieve inbound calls
+
+First, in our frintend, we want to add the twilio client
+
+yarn add twilio-client
+
+From here we want to add the following code to app.js
+
+    useEffect(() => {
+      console.log('Twilio Token Changed')
+    }, [twilioToken])
+
+    //If you haven't got it already, intalling vs code react intellisense is super helpful
+    //they're nice for writing useState and useEffect functions quickly
+
+    //adding more code
+
+      function connectTwilioVoiceClient(twilioToken) {
+    const device = new Twilio.Device(twilioToken, { debug: true }); //make sure to add the keyword new here. wasted alot of time debugging here
+    device.on('error' , (error) => {
+      console.log(error);
+    });
+
+    //We're going to use this function to connect to the voice client.
+    //Let's go to our client dashboard and select 'programmable voice'
+    //from there we want to go to twiML apps
+    //create new app and add the URL we get from local tunnel
+    //grab the App SID and save it to a variable in our twilio.js file
+
+    //We're going to use that variable to send a token to the backend
+
+    // in our twilio file, we're going to create a new function. Looks like this:
+
+    //Twilio.js
+
+      getTokenForVoice(identity) {
+    console.log(`Token for ${identity}`);
+    const VoiceToken = twilio.jwt.AccessToken;
+    const VoiceGrant = AccessToken.VoiceGrant;
+    const voiceGrant = new VoiceGrant({
+      sashaLineSid,
+      incomimgAllow: true,
+    });
+
+    // Create a new object and pass the paramaters of the app sid and incomimgAllow set to true
+
+    const token = new AccessToken(
+        this.accountSid,
+        this.tokenSid,
+        this.tokenSecret,
+        {identity}
+    );
+
+    //We do the same with the access token class
+
+    token.addGrant(voiceGrant);
+
+    //pass the voice grant to the token throuh addGrant()
+
+    console.log('Access Granted with JWT', token.toJwt());
+    return (token.toJwt())
+
+    //return the result
+  }
+
+# now that we have the backend setup, we're going to pass the token to the frontend so we can 
+start answering calls. This is the code that we are going to use in our App.js file
+
+//we use this function to connect to twilios voice client
+  function connectVoiceClient(twilioToken) {
+    const device = new Twilio.Device(twilioToken, { debug: true });
+    device.on("error", (error) => {
+      console.log(error);
+    });
+
+    //And then we call it in the 'useEffect twilio-token function like this:
+
+      useEffect(() => {
+    console.log("Twilio Token Changed");
+    if(twilioToken){
+      connectVoiceClient(twilioToken);
+    }
+  }, [twilioToken]);
+
+

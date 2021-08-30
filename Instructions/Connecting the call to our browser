@@ -1,0 +1,57 @@
+Going forward , we want to make sure that our client name matches the indentity referenced in our twilio file.
+Take a look:
+
+
+//server.js
+socket.on("connection", (socket) => {
+  console.log("Socket Connected at", socket.id);
+  socket.emit("twilio-token", { token: getTokenForVoice("sashaline") }); //client name here
+  socket.on("disconnect", () => {
+    console.log("Socket Disconnected at", socket.id);
+  });
+  socket.on("answer-call", ({ sid }) => {
+    console.log("Setting Call:", sid);
+    twilio.answerCall(sid);
+  });
+});                                                                             
+                                                                                      ^
+app.post("/connect-call", (req, res) => {                                             |
+  console.log("Picking Up!");                                                         |
+  const response = twilio.redirectCall("sashaline"); //must match client name above!! |
+  res.type("text/xml");
+  res.send(response.toString());
+});
+
+# then we call twilio again. Make sure to have your mic enabled or twilio WILL hang up on you.
+
+// also, you'll notice that the browser returns duplicate calls when receiving a call, so pretty
+we have to search for the index of the current call, then if its not found (index === -1), then we know
+it's safe to push the call into our calls array
+
+    socket.client.on("call-new", (data) => {
+      setCalls((draft) => {
+
+          //we set our index
+        const index = draft.calls.findIndex(
+          ({ callSid }) => callSid === data.callSid
+        );
+        //If the index isn't found, then we push the call the calls array
+        if(index === -1){
+          draft.calls.push(data);
+        }
+      });
+    });
+
+    //It's going to be the same type of deal for the enqueue endpoint
+
+        socket.client.on("enq", (data) => {
+      setCalls((draft) => {
+        const index = draft.calls.findIndex(
+          ({ callSid }) => callSid === data.callSid
+        );
+        if(index === -1){
+          return;
+        }
+        draft.calls[index].data.CallStatus = "enqueue";
+      });
+    });

@@ -1,0 +1,44 @@
+#socket is pretty straightfoward. We want to start out with a new fil in the utils folder
+let's call it SocketIo.js
+
+The code looks like this:
+
+import io from 'socket.io-client';
+const socket = io.connect('http://localhost:3001');
+export default socket;
+
+//import io
+//assign io to a const. In this case it's 'socket'
+//export it like so
+
+#then well need to hook up socket to both ends. Backend looks like this:
+
+const http = require('http');
+const socketIo = require('socket.io');
+
+
+const server = http.createServer(app);
+const socket = socketIo(server);
+
+socket.on('connection', (socket) => {
+    console.log('Socket Connected at', socket.id);
+    socket.on("disconnect", (socket) => {
+        console.log('Socket Disconnected');
+    });
+});
+
+//Please view documentation to cutomize request or handle CORs issue in chrome
+
+#Now we hook it up to frontend. our app.js now looks like this:
+
+import socket from './utils/SocketIo.js';
+
+  useEffect(() => {
+    socket.on('disconnect', () => {
+      console.log('Socket Disconnected');
+    })
+    return () => { };
+  }, []);
+
+  this is in addition to the other code in app.js
+  #We should be ready to roll now!

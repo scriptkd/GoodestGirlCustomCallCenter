@@ -1,0 +1,98 @@
+#First we want to go back into our Twilio.js file and reference our phone action (twiml).
+then we want to redirect it to our server with a new endpoint.
+
+Were going to put it in the voiceResponce function, Like so:
+
+    voiceResponse(message) {
+        const twiml = new VoiceResponse();
+        twiml.say({
+            voice: "Polly.Brian"
+        },
+            message
+        );
+        twiml.redirect('https://sashaline.loca.lt/(new endpoint here)')
+
+        //In this case. we're going to put 'enqueue' as the endpoint
+
+        return twiml;
+    }
+}
+
+# now we're going to go back to server.js and create the endpoint 'enqueue' Like so:
+
+app.post('enqueue', (req, res) => {
+    console.log('Putting in que')
+})
+
+in the callback functions, we're going to create another function in twilio.js
+
+   enqueueCall(){
+       const twiml = new VoiceResponse();
+       twiml.enqueue();
+       return twiml;
+   }
+
+   important to note, if we have a class, we dont need to preface our function with the word 'function'.
+   A bit of basic JS knowledge, but I got tripped up on this for a second.
+
+   So now we return to our server and add the response:
+
+   app.post('enqueue', (req, res) => {
+    const resoonse = twilio.voiceResponse('Thank you for holding! we are dedicated to bringing you the best service possible. while you wait, please take a moment to reflect on how good the goodest girl really is, and we\'ll have an agent on the line with you shortly! Cola and Meal Please no bread!');
+    res.type('text/xml');
+    res.send(response.toString());
+})
+
+#Call and test!
+
+Note: I went back and renamed the endpoint 'enq' because i cant spell XD
+
+This is okay, but in order to put multiple calls on hold, we'll need to call the twilio functon enqueue
+so now our enque post should look like this
+
+app.post('/enq', (req, res) => {
+    /*
+    //Gonna add this code in later
+
+    twilio.voiceResponse('Please hold for one moment while we consult the gods! we are dedicated to bringing you the best service possible. Please take a moment to reflect on how good the goodest girl really is, and we\'ll have an agent on the line with you shortly! One does not simply pet Sasha just once! She demands more pets everyday. All day. Can\'t stop. won\'t stop. Wutang Clan forever.')
+
+    */
+    const response = twilio.enqueueCall("Sasha Treat Line"); //twilio.enqueue(We need to give it a name here)
+    res.type('text/xml');
+    res.send(response.toString());
+})
+
+# Sp now we can go back to twilio.js and match the template enqueueCall function. like so:
+
+   enqueueCall(enqName){
+       const twim = new VoiceResponse();
+       twim.enqueue(enqName);
+       return twim;
+   }
+
+   #We can now direct calls to out enq endpoint! 
+
+   ---------------------------------------------------------------------------------------
+   
+   Next we're going to update the call status to enqueued
+
+   ----------------------------------------------------------------------------------------
+
+   on our server.js file, we're going to emit some data to our endpoint 'enq':
+
+   socket.emit("enq", { data: req.body });
+
+   //This goes inside our app.post('enq') 
+
+   #Now we want to head over to app.js and connect from socket. Like so:
+
+       socket.on("enqueue", (data) => {
+      setCalls((draft) => {
+        const index = draft.calls.findIndex(
+          ({ CallSid }) => CallSid === data.CallSid
+        ); //Here, we're finding the index of each call and putting them in queue
+        draft.calls[index].data.CallStatus = "enqueue";
+      });
+    });
+
+    //Next, we're going to change the display based on the status of the call

@@ -1,0 +1,37 @@
+# Our Call Center File now looks like this:
+
+import React from "react";
+import CallProgress from "./CallProgress";
+import NavBar from "./navBar";
+
+function CallCenter({ calls }) {
+  return (
+    <div>
+      <NavBar />
+        {calls.calls.map((call) => (
+            <CallProgress call={call} />
+        ))}
+    </div>
+  );
+}
+
+export default CallCenter;
+
+//First we destructure calls and map the calls with the CallProgress component. 
+The CallProgress should now only appear when we receive a call.
+Of course, we'll have to go back to our app.js and pass in our calls to the call center component. Like so:
+
+{storedToken ? (
+        <CallCenter calls={calls}></CallCenter>
+
+        //And then finally, we can go ahead pass our data variables to the call description attribute in
+        our CallProgress.js file. Like so:
+
+        <Step
+          icon="phone"
+          title="Ringing"
+          description={call.data.Direction + ' call from ' + call.data.From + ' | ' + call.data.FromState + ', ' + call.data.FromCountry}
+          completed
+        />
+
+        

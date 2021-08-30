@@ -1,0 +1,62 @@
+#Connecting axios is straightforward.
+
+import axios from 'axios';
+
+export default axios.create({
+    baseURL: 'http://localhost:3001',
+    responseType: 'json',
+})
+
+in the baseURL, we use the backend url. response JSON.
+
+#next, you import into App.js, like so:
+
+import axios from './utils/axios.js';
+
+our App.js file should look like this now
+
+function App() {
+  const [user, setUser] = useImmer({
+    username: '',
+    mobileNumber: '',
+  })
+  async function sendSmsCode(){
+    console.log(`Sending SMS...`);
+
+    //We just use the endpoint '/login' because the baseURL is already defined
+
+     await axios.post('/login', {
+      to: `+1 ${user.mobileNumber}`,
+      username: user.username,
+      channel: 'sms',
+    })
+  }
+  return (
+    <div>
+      <Login user={user} setUser={setUser} sendSmsCode = {sendSmsCode} />
+      //Reference login.js to see the Login function, where it takes 3 parameters, user, setUser function, sendSmsCode function (you can add more in login.js, we're just doing for example's sake.)
+    </div>
+  );
+}
+
+export default App;
+
+#We want to add the following code to server.js
+
+app.use(express.json());
+
+//This ensures we can parser the body of the response. we no longer need middleware
+
+#Then we change our login request to look like this
+#app should now be a post request to the endpoint
+#we deconstructed the to, username and channel variable in req.body
+#So now we can use the twilio async function sendVerify to send out the code and assign it to a const (data)
+//please view twilio.js to see th function and the args it takes. Once the promise is resolved and data has a value
+we can send the response to the 'to' variable.
+
+app.post('/login' , async (req, res) => {
+    console.log('Youre logging in');
+    const {to, username, channel} = req.body;
+    const data = await twilio.sendVerify(to, channel);
+    res.send(data);
+})

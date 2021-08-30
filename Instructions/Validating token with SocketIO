@@ -1,0 +1,52 @@
+Now that we have something working with token validation, were going to switch it up a bit to validate in real time with
+socketio
+
+We're going to add a couple more lines of code to our socketio file
+
+our socketio file now looks like this:
+
+import io from "socket.io-client";
+
+class Socket {
+  url = "http://localhost:3001";
+  client = null;
+  constructor() {
+    this.client = io.connect(this.url);
+  }
+  addToken(token) {
+    this.client = io.connect(this.url);
+  }
+  removeToken() {
+    this.client = io.connect(this.url);
+  }
+}
+
+const instance = new Socket();
+
+export default instance;
+
+// Notice we created a class and added a couple more functions
+ for adding and removing a token. We're going to habdle this next.
+
+#Something to note, we also have to go back to our app,js file
+and change or socket.on functions to instance.client.on functions, like so;
+
+  useEffect(() => {
+    socket.client.on("disconnect", () => {
+      console.log("Socket Disconnected");
+    });
+    socket.client.on("call-new", (data) => {
+      setCalls((draft) => {
+        draft.calls.push(data);
+      });
+    });
+    socket.client.on("enq", (data) => {
+      setCalls((draft) => {
+        const index = draft.calls.findIndex(
+          ({ callSid }) => callSid === data.callSid
+        );
+        draft.calls[index].data.CallStatus = "enqueue";
+      });
+    });
+
+    Next we're going to handle adding and removing tokens~

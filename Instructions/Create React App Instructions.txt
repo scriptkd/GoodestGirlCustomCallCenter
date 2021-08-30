@@ -1,0 +1,12 @@
+#Go back to the parent directory and run 'npx create-react-app'. This will start a new app in the parent directory.
+
+#After that you want to run 'npx create-react-app (ForntEnd Folder Name Here)'
+#This will create your react app inside the designated folder
+
+#then we want to add the following dependencies to the frontend folder. Like so:
+yarn add twilio-client axios semantic-ui-react semantic-ui-css
+
+#at this stage, you can pretty much remove most of the files except App.js and index.js from the source filesunless you nede to keeo it for some specific reason
+
+#then you're done!!
+
