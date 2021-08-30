@@ -1,0 +1,68 @@
+body{
+    background-color: cadetblue;
+}
+
+.ui.header:first-child {
+  color: white;
+  font-family: JustAnotherHand;
+  font-size: 4.2rem;
+  font-weight: 100;
+}
+
+.ui.menu:not(.secondary):not(.text):not(.tabular):not(.borderless)>.container>.item:not(.right):not(.borderless):first-child {
+    border-left: 1px solid rgba(34,36,38,.1);
+    font-family: JustAnotherHand;
+    font-size: 1.4rem;
+}
+.ui.eight.steps, .ui.five.steps, .ui.four.steps, .ui.one.steps, .ui.seven.steps, .ui.six.steps, .ui.three.steps, .ui.two.steps {
+  margin-top: 2.5rem;
+}
+
+.ui.fluid.button{
+    display: block;
+    background-color: cadetblue;
+    color: white;
+    margin-top: .5rem;
+}
+.ui.fluid.button:hover{
+    display: block;
+    background-color: rgba(95, 158, 160, 0.603);
+    color: white;
+}
+
+.ui.segment:last-child{
+    margin-top: 2rem;
+}
+
+.ui.grid {
+  size: 100vh;
+}
+
+.ui.blue.button,
+.ui.blue.buttons .button {
+  margin-top: 10px;
+}
+.ui.fluid.button, .ui.fluid.buttons {
+  margin-bottom: 1rem;
+}
+.ui.middle.aligned.image {
+  margin: 0rem 1rem;
+}
+.ui.form .field>label {
+    color: white;
+}
+.ui.checkbox label, .ui.checkbox+label {
+    color: white;
+}
+.ui.checkbox label:hover, .ui.checkbox+label:hover {
+    color: white;
+}
+.ui.avatar.image, .ui.avatar.image img, .ui.avatar.image svg, .ui.avatar.images .image, .ui.avatar.images img, .ui.avatar.images svg {
+    margin-right: 1rem;
+}
+@font-face {
+  font-family: "JustAnotherHand";
+  src: local("JustAnotherHand"),
+    url("../fonts/JustAnotherHand-Regular.ttf") format("truetype");
+  font-weight: normal;
+}
